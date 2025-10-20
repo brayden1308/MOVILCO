@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pruebas Auth FastAPI + Supabase</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+    h2 { margin-top: 0; }
+    input { margin: 5px 0; display: block; padding: 8px; width: 250px; }
+    button { padding: 8px 15px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 10px; }
+  </style>
+</head>
+<body>
+
+<h1>Tester de Autenticación</h1>
+
+<!-- Registro -->
+<section>
+  <h2>Registro (/register)</h2>
+  <input id="reg_email" type="email" placeholder="Email" />
+  <input id="reg_pass" type="password" placeholder="Contraseña" />
+  <button onclick="register()">Registrar</button>
+</section>
+
+<!-- Login -->
+<section>
+  <h2>Login (/login)</h2>
+  <input id="log_email" type="email" placeholder="Email" />
+  <input id="log_pass" type="password" placeholder="Contraseña" />
+  <button onclick="login()">Iniciar sesión</button>
+</section>
+
+<!-- Datos del usuario -->
+<section>
+  <h2>Ver usuario actual (/me)</h2>
+  <button onclick="getMe()">Obtener datos</button>
+</section>
+
+<!-- Cambiar contraseña -->
+<section>
+  <h2>Restablecer Contraseña (/reset-password)</h2>
+  <input id="reset_email" type="email" placeholder="Email" />
+  <input id="reset_old" type="password" placeholder="Contraseña actual" />
+  <input id="reset_new" type="password" placeholder="Nueva contraseña" />
+  <button onclick="resetPassword()">Cambiar contraseña</button>
+</section>
+
+<!-- Logout -->
+<section>
+  <h2>Logout (/logout)</h2>
+  <button onclick="logout()">Cerrar sesión</button>
+</section>
+
+<pre id="output">Esperando acciones...</pre>
+
+<script>
+const API_URL = "http://127.0.0.1:8000";
+let token = localStorage.getItem("token") || null;
+
+// Mostrar mensajes
+function log(message) {
+  document.getElementById("output").textContent = typeof message === "object" ? JSON.stringify(message, null, 2) : message;
+}
+
+// Registro
+async function register() {
+  const email = document.getElementById("reg_email").value;
+  const password = document.getElementById("reg_pass").value;
+  const res = await fetch(`${API_URL}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  log(await res.json());
+}
+
+// Login
+async function login() {
+  const email = document.getElementById("log_email").value;
+  const password = document.getElementById("log_pass").value;
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  if (data.token) {
+    token = data.token;
+    localStorage.setItem("token", token);
+  }
+  log(data);
+}
+
+// Ver usuario actual
+async function getMe() {
+  if (!token) return log("No hay token guardado!");
+  const res = await fetch(`${API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  log(await res.json());
+}
+
+// Cambiar contraseña
+async function resetPassword() {
+  const email = document.getElementById("reset_email").value;
+  const old_password = document.getElementById("reset_old").value;
+  const new_password = document.getElementById("reset_new").value;
+  const res = await fetch(`${API_URL}/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, old_password, new_password }),
+  });
+  log(await res.json());
+}
+
+// Logout
+function logout() {
+  token = null;
+  localStorage.removeItem("token");
+  log("Sesión cerrada. Token eliminado.");
+}
+</script>
+
+</body>
+</html>

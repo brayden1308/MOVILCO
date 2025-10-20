@@ -24,6 +24,16 @@ ALGORITHM = "HS256"
 # ===============================
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Puedes poner "*" para permitir todo o ["http://localhost:5500"] si quieres limitarlo
+    allow_credentials=True,
+    allow_methods=["*"],  # Esto permite POST, GET, OPTIONS, PUT, DELETE, etc.
+    allow_headers=["*"],  # Permite cualquier header, incluyendo Authorization
+)
+
 
 class UserRegister(BaseModel):
     email: str
@@ -49,8 +59,9 @@ async def register(user: UserRegister):
 
     # Insertar en Supabase
     data = supabase.table("usuarios").insert({"email": user.email, "password": hashed}).execute()
+    print("Resultado Supabase INSERT:", data)
+    return {"message": "Usuario registrado correctamente", "db_response": data}
 
-    return {"message": "Usuario registrado correctamente"}
 
 # ===============================
 # RUTA: LOGIN
@@ -88,5 +99,31 @@ async def get_me(Authorization: str = Header(None)):
         return {"email": payload["email"], "id": payload["id"]}
     except (JWTError, IndexError):
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
+@app.post("/logout")
+async def logout():
+    return {"message": "Logout exitoso. Elimina el token en el frontend."}
+class PasswordReset(BaseModel):
+    email: str
+    old_password: str
+    new_password: str
 
+@app.post("/reset-password")
+async def reset_password(data: PasswordReset):
+    # Buscar usuario
+    response = supabase.table("usuarios").select("*").eq("email", data.email).execute()
+    if not response.data:
+        raise HTTPException(status_code=400, detail="Usuario no encontrado")
 
+    db_user = response.data[0]
+
+    # Verificar contraseña actual
+    if not bcrypt.checkpw(data.old_password.encode('utf-8'), db_user["password"].encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Contraseña actual incorrecta")
+
+    # Hash nueva contraseña
+    new_hashed = bcrypt.hashpw(data.new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    # Actualizar en Supabase
+    supabase.table("usuarios").update({"password": new_hashed}).eq("email", data.email).execute()
+
+    return {"message": "Contraseña actualizada correctamente"}
