@@ -5,6 +5,7 @@ import bcrypt
 from jose import jwt, JWTError
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 
@@ -28,6 +29,17 @@ ALGORITHM = "HS256"
 # ===============================
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+#  Montar carpetas estáticas correctamente
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/IMG", StaticFiles(directory="IMG"), name="IMG")
 app.mount("/static", StaticFiles(directory="."), name="static")
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -141,6 +153,6 @@ async def get_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    file_path = os.path.join(os.path.dirname(__file__), "index.html")
+    file_path = os.path.join(os.path.dirname(__file__), "templates/index.html")
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
