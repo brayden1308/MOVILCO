@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Divisor Vinotinto</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="image-side">
+      <img src="IMG/maxresdefault.jpg" alt="5G">
+    </div>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <div class="login-side">
+      <img src="IMG/images-removebg-preview.png" alt="Logo" class="logo">
+
+      <!-- FORMULARIO LOGIN -->
+      <form id="loginForm" class="login-form">
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+        <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        <button type="submit">Ingresar</button>
+      </form>
+
+      <hr style="margin: 30px 0; width: 80%; border: 1px solid var(--vinotinto);">
+
+      <!-- FORMULARIO REGISTRO -->
+      <h3 style="color: var(--vinotinto); margin-bottom: 10px;">Registro de prueba</h3>
+      <form id="registerForm" class="login-form">
+        <input type="email" id="registerEmail" placeholder="Correo electrónico nuevo" required>
+        <input type="password" id="registerPassword" placeholder="Contraseña nueva" required>
+        <button type="submit" style="background-color:#4CAF50;">Registrar</button>
+      </form>
+
+      <!-- Mensajes -->
+      <p id="message" style="margin-top:15px; color:#333;"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000"; // Cambia si tu backend está en otro puerto
+
+    // LOGIN
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("message");
+
+      if (res.ok) {
+        msg.textContent = "✅ Inicio de sesión exitoso.";
+        msg.style.color = "green";
+        console.log("Token:", data.token);
+      } else {
+        msg.textContent = "❌ " + data.detail;
+        msg.style.color = "red";
+      }
+    });
+
+    // REGISTRO
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+
+      const res = await fetch(`${API_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("message");
+
+      if (res.ok) {
+        msg.textContent = "✅ Usuario registrado correctamente.";
+        msg.style.color = "green";
+      } else {
+        msg.textContent = "❌ " + data.detail;
+        msg.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>

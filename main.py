@@ -16,7 +16,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # CONFIGURACIÓN JWT
 # ===============================
 
-SECRET_KEY = "Emivargas1308"  # cámbiala si quieres
+SECRET_KEY = "Emivargas1308" 
 ALGORITHM = "HS256"
 
 # ===============================
@@ -25,15 +25,6 @@ ALGORITHM = "HS256"
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Puedes poner "*" para permitir todo o ["http://localhost:5500"] si quieres limitarlo
-    allow_credentials=True,
-    allow_methods=["*"],  # Esto permite POST, GET, OPTIONS, PUT, DELETE, etc.
-    allow_headers=["*"],  # Permite cualquier header, incluyendo Authorization
-)
-
 
 class UserRegister(BaseModel):
     email: str
@@ -127,3 +118,19 @@ async def reset_password(data: PasswordReset):
     supabase.table("usuarios").update({"password": new_hashed}).eq("email", data.email).execute()
 
     return {"message": "Contraseña actualizada correctamente"}
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+
+
+# Archivos estáticos
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/IMG", StaticFiles(directory="IMG"), name="IMG")
+
+# HTML
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def get_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
