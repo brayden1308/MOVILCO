@@ -3,6 +3,10 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 import bcrypt
 from jose import jwt, JWTError
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, FileResponse
+import os
+
 
 # ===============================
 # CONFIGURACIÓN SUPABASE
@@ -24,6 +28,7 @@ ALGORITHM = "HS256"
 # ===============================
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="."), name="static")
 from fastapi.middleware.cors import CORSMiddleware
 
 class UserRegister(BaseModel):
@@ -134,3 +139,8 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/", response_class=HTMLResponse)
+async def serve_index():
+    file_path = os.path.join(os.path.dirname(__file__), "index.html")
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
