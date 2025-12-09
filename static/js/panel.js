@@ -1,10 +1,6 @@
 const API = "https://movilco.onrender.com"; // Backend Render
 const token = localStorage.getItem("token");
 
-// Si no hay token → volver al login
-if (!token) {
-  window.location.href = "/";
-}
 
 // ======================
 // Mostrar datos del usuario desde el JWT
@@ -125,3 +121,10 @@ async function loadMetas(distrito) {
   box.innerHTML = html;
 }
 
+// ======================
+// LOGOUT
+// ======================
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
