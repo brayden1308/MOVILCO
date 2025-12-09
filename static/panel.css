@@ -1,13 +1,110 @@
-/* panel.css - usa tu estilo existente y añade lo necesario */
-:root{--vinotinto:#800020}
-body{margin:0;font-family:Arial;background:#dcdcdc}
-.top-banner{background:var(--vinotinto);height:70px;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.logo{height:50px}
-.user-info{text-align:right}
-.main-container{display:flex;padding:20px}
-.menu{width:260px;display:flex;flex-direction:column;gap:10px}
-.menu-btn{background:white;border:2px solid #c4c4c4;padding:12px;border-radius:12px;cursor:pointer;text-align:left}
-.submenu{display:flex;flex-direction:column;margin-left:10px}
-.content-box{background:white;border-radius:12px;padding:20px;margin-left:30px;flex:1;min-height:450px}
-.region-item{padding:8px;border-radius:8px;border:1px solid #eee;background:#fff;cursor:pointer;margin-bottom:6px}
-.region-item:hover{background:#f6f6f6}
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f4ef;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #4a2c2a;
+}
+
+/* HEADER */
+header {
+    background: #4a2c2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+}
+
+.logo {
+    height: 60px;
+}
+
+.logout-btn {
+    background: #c2352f;
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+/* USER INFO */
+.user-info {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* CARD */
+.card {
+    width: 90%;
+    max-width: 700px;
+    background: white;
+    margin: auto;
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+.banner {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.btn {
+    margin: 15px 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: white;
+    background: #4a2c2a;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background: #7a4d49;
+}
+
+.select-text {
+    font-size: 18px;
+    margin: 15px 0;
+}
+.list-container {
+    width: 90%;
+    max-width: 700px;
+    margin: 15px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.1);
+}
+
+.region-item {
+    background: #d9c085;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.region-item:hover {
+    background: #c8ae6f;
+}
+
+table {
+    text-align: center;
+    font-size: 16px;
+}
+
+th {
+    background: #4a2c2a;
+    color: white;
+    padding: 8px;
+}
+td {
+    padding: 6px;
+}

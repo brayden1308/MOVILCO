@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <title>Panel - MOVILCO</title>
-  <link rel="stylesheet" href="/static/css/panel.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel - Movilco</title>
+  <link rel="stylesheet" href="/static/panel.css">
 </head>
+
 <body>
-  <div class="top-banner">
-    <img src="/IMG/images-removebg-preview.png" class="logo" alt="logo">
-    <div class="user-info" id="userInfo"></div>
-  </div>
+  <header>
+    <img src="/IMG/logo.png" class="logo" alt="Movilco">
+    <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+  </header>
 
-  <div class="main-container">
-    <div class="menu">
-      <button class="menu-btn" onclick="toggleRegions()">Regiones</button>
-      <div id="regionsList" class="submenu"></div>
+  <section class="user-info">
+    <h2 id="userEmail"></h2>
+    <p id="userDetails"></p>
+  </section>
 
-      <div style="margin-top:20px">
-        <button class="menu-btn" onclick="loadContent('metas')">Metas del Distrito</button>
-      </div>
-
-      <button class="menu-btn" onclick="logout()">Cerrar sesión</button>
+  <section class="main-content">
+    <h1>Seguimiento de ventas Líderes</h1>
+    
+    <div class="card">
+      <img src="/IMG/nacional.png" class="banner">
+      <p class="select-text">Selecciona una región para continuar</p>
+      <button class="btn" id="btnRegiones">Regiones</button>
+      <button class="btn" id="btnMetas">Metas del Distrito</button>
     </div>
-
-    <div class="content-box" id="contentBox">
-      <h2>Bienvenido</h2>
-      <div id="mainArea">Selecciona una región para continuar</div>
-    </div>
-  </div>
+  </section>
 
   <script src="/static/js/panel.js"></script>
 </body>
