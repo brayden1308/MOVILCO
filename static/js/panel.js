@@ -1,130 +1,79 @@
-const API = "https://movilco.onrender.com"; // Backend Render
+const API = "https://movilco.onrender.com";
 const token = localStorage.getItem("token");
+console.log("DEBUG: token from localStorage:", token);
 
+if (!token) {
+  console.warn("DEBUG: No token found — redirecting to login");
+  // no redirigir inmediatamente para ver errores: mostrar aviso visible
+  document.body.innerHTML = `
+    <div style="padding:30px;text-align:center;">
+      <h2>No autenticado</h2>
+      <p>No existe token en localStorage. Vuelve al <a href="/">login</a>.</p>
+    </div>`;
+  throw new Error("No token");
+}
 
-// ======================
-// Mostrar datos del usuario desde el JWT
-// ======================
+let payload = null;
 try {
-  const payload = JSON.parse(atob(token.split(".")[1]));
-
-  document.getElementById("userInfo").innerHTML = `
-    <strong>${payload.email}</strong><br>
-    ${payload.role || "Rol no definido"} - ${payload.distrito || "Nacional"}
-  `;
+  payload = JSON.parse(atob(token.split(".")[1]));
+  console.log("DEBUG: token payload:", payload);
 } catch (e) {
-  console.error("Error decoding token:", e);
-  logout();
+  console.error("DEBUG: Error decoding token:", e);
+  // mostrar mensaje en pantalla para no redirigir y perder el log
+  document.body.innerHTML = `
+    <div style="padding:30px;text-align:center;">
+      <h2>Token inválido</h2>
+      <pre style="color:red;">${e.toString()}</pre>
+      <p>Elimina el token manualmente en DevTools → Application → Local Storage</p>
+      <a href="/">Volver a login</a>
+    </div>`;
+  throw e;
 }
 
-// ======================
-// REGIONES
-// ======================
-async function toggleRegions() {
-  const container = document.getElementById("regionsList");
-
-  if (container.innerHTML.trim() !== "") {
-    container.innerHTML = "";
-    return;
-  }
-
-  container.innerHTML = "<em>Cargando regiones...</em>";
-
-  const res = await fetch(`${API}/regions`);
-  if (!res.ok) {
-    container.innerHTML = "<p>Error cargando regiones</p>";
-    return;
-  }
-
-  const regions = await res.json();
-  container.innerHTML = "";
-
-  regions.forEach(r => {
-    const div = document.createElement("div");
-    div.className = "region-item";
-    div.textContent = r.nombre;
-    div.onclick = () => loadDistricts(r.id, r.nombre);
-    container.appendChild(div);
-  });
+// Asegura que el contenedor exista en el HTML
+if (!document.getElementById("userInfo")) {
+  const s = document.createElement("div");
+  s.id = "userInfo";
+  s.style.margin = "18px";
+  document.body.insertBefore(s, document.body.firstChild);
 }
 
-// ======================
-// DISTRITOS
-// ======================
-async function loadDistricts(region_id, region_name) {
-  const res = await fetch(`${API}/districts/${region_id}`);
-  const districts = await res.json();
+document.getElementById("userInfo").innerHTML = `
+  <strong>${payload.email}</strong><br>
+  ${payload.role || "Rol no definido"} - ${payload.distrito || "Nacional"}
+`;
 
-  const box = document.getElementById("mainArea");
-  box.innerHTML = `<h3>${region_name}</h3>`;
-
-  if (!districts.length) {
-    box.innerHTML += "<p>No hay distritos disponibles</p>";
-    return;
+// Aquí ya tenemos token y payload OK — validar /me opcionalmente
+(async function validateMe() {
+  try {
+    const r = await fetch(`${API}/me`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    console.log("DEBUG: /me status", r.status);
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error("DEBUG: /me response not ok:", r.status, txt);
+      // mostramos error en pantalla sin redirigir
+      const box = document.createElement("div");
+      box.style.padding = "20px";
+      box.innerHTML = `<p style="color:red">Error validando token: ${r.status} — revisa consola</p>`;
+      document.body.appendChild(box);
+      return;
+    }
+    const me = await r.json();
+    console.log("DEBUG: /me payload", me);
+    // si quieres mostrar más datos:
+    const info = document.getElementById("userInfo");
+    info.innerHTML += `<br><small>ID: ${me.id ?? "N/A"}</small>`;
+  } catch (err) {
+    console.error("DEBUG: fetch /me failed:", err);
+    const box = document.createElement("div");
+    box.style.padding = "20px";
+    box.innerHTML = `<p style="color:red">Error conectando a backend. Revisa logs.</p>`;
+    document.body.appendChild(box);
   }
+})();
 
-  districts.forEach(d => {
-    const btn = document.createElement("button");
-    btn.className = "btn-secondary";
-    btn.textContent = d.nombre;
-    btn.onclick = () => loadMetas(d.nombre);
-    box.appendChild(btn);
-  });
-}
-
-// ======================
-// METAS
-// ======================
-async function loadMetas(distrito) {
-  const box = document.getElementById("mainArea");
-  box.innerHTML = `<h3>Metas - ${distrito}</h3><em>Cargando...</em>`;
-
-  const res = await fetch(`${API}/metas/${encodeURIComponent(distrito)}`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-
-  if (!res.ok) {
-    box.innerHTML = `<p>Error cargando metas: ${res.statusText}</p>`;
-    return;
-  }
-
-  const metas = await res.json();
-
-  if (!metas.length) {
-    box.innerHTML = `<h3>Metas - ${distrito}</h3><p>No hay metas registradas.</p>`;
-    return;
-  }
-
-  let html = `
-    <h3>Metas - ${distrito}</h3>
-    <table class="metas-table">
-    <tr>
-        <th>Año</th>
-        <th>Mes</th>
-        <th>Objetivo</th>
-        <th>Alcanzado</th>
-    </tr>
-  `;
-
-  metas.forEach(m => {
-    html += `
-      <tr>
-        <td>${m.anio}</td>
-        <td>${m.mes}</td>
-        <td>${m.objetivo}</td>
-        <td>${m.alcanzado}</td>
-      </tr>
-    `;
-  });
-
-  html += `</table>`;
-  box.innerHTML = html;
-}
-
-// ======================
-// LOGOUT
-// ======================
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "/";
-}
+// resto de funciones (regiones/distritos/metas)...
+// Para no romper, reinserta el resto de tu código aquí (toggleRegions, loadDistricts, loadMetas, logout)
+// pero deja estas funciones sin cambio para depuración.
