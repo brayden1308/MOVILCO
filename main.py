@@ -161,3 +161,6 @@ async def get_metas(distrito: str, Authorization: str = Header(None)):
     distrito_id = r.data[0]["id"]
     metas = supabase.table("metas").select("*").eq("distrito_id", distrito_id).execute()
     return metas.data
+@app.get("/panel", response_class=HTMLResponse)
+async def get_panel(request: Request):
+    return templates.TemplateResponse("panel.html", {"request": request})

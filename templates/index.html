@@ -43,32 +43,42 @@
   </div>
 
   <script>
-    const API_URL = "https://movilco.onrender.com"; // Cambia si tu backend está en otro puerto
-  
-    // LOGIN
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+    constAPI_URL = "https://movilco.onrender.com"; // URL de tu backend en Render
 
-      const res = await fetch(`${API_URL}/login`, {
+// LOGIN
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      });
+    });
 
-      const data = await res.json();
-      const msg = document.getElementById("message");
+    const data = await res.json();
+    const msg = document.getElementById("message");
 
-      if (res.ok) {
+    if (res.ok) {
         msg.textContent = "✅ Inicio de sesión exitoso.";
         msg.style.color = "green";
-        console.log("Token:", data.token);
-      } else {
+
+        // Guardamos token para futuras solicitudes
+        localStorage.setItem("token", data.token);
+
+        // Redirigir al Panel de control
+        setTimeout(() => {
+            window.location.href = "/panel.html";
+        }, 1000);
+
+    } else {
         msg.textContent = "❌ " + data.detail;
         msg.style.color = "red";
-      }
-    });
+    }
+});
+
 
     // REGISTRO
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
