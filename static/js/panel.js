@@ -125,10 +125,3 @@ async function loadMetas(distrito) {
   box.innerHTML = html;
 }
 
-// ======================
-// LOGOUT
-// ======================
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "/";
-}
