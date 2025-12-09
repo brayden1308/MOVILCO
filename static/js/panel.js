@@ -1,18 +1,38 @@
-// Base API URL
+// ============================
+//  CONFIGURACIÓN BASE
+// ============================
 const API = "https://movilco.onrender.com";
-
-// Leer token
 const token = localStorage.getItem("token");
+
+// Si no hay token: vuelve al login
 if (!token) window.location.href = "/";
 
-// Decodificar payload del usuario
+// Decodificar token
 const payload = JSON.parse(atob(token.split(".")[1]));
+
+// Mostrar info del usuario
 document.getElementById("userInfo").innerHTML = `
   <strong>${payload.email}</strong><br>
-  ${payload.role} - ${payload.distrito || 'Nacional'}
+  ${payload.role} - ${payload.distrito || "Nacional"}
 `;
 
-// ===== REGIONES =====
+// ============================
+//  CONTROL POR ROLES
+// ============================
+if (payload.role === "misionera") {
+  document.getElementById("btnRegiones").style.display = "none";
+}
+
+if (payload.role === "distrito") {
+  document.getElementById("btnRegiones").style.display = "none";
+}
+
+// Nacional = todo habilitado (no tocamos nada)
+
+
+// ============================
+//  REGIONES
+// ============================
 async function toggleRegions() {
   const cont = document.getElementById("regionsList");
 
@@ -39,7 +59,10 @@ async function toggleRegions() {
   });
 }
 
-// ===== DISTRITOS =====
+
+// ============================
+//  DISTRITOS
+// ============================
 async function loadDistricts(region_id, region_name) {
   const box = document.getElementById("mainArea");
   box.innerHTML = `<h3>${region_name}</h3><p>Cargando distritos...</p>`;
@@ -50,7 +73,7 @@ async function loadDistricts(region_id, region_name) {
   box.innerHTML = `<h3>${region_name}</h3>`;
 
   if (!districts.length) {
-    box.innerHTML += "<p>No hay distritos registrados todavía.</p>";
+    box.innerHTML += "<p>No hay distritos registrados</p>";
     return;
   }
 
@@ -63,7 +86,10 @@ async function loadDistricts(region_id, region_name) {
   });
 }
 
-// ===== METAS =====
+
+// ============================
+//  METAS POR DISTRITO
+// ============================
 async function loadMetas(distrito) {
   const box = document.getElementById("mainArea");
   box.innerHTML = `<h3>Metas - ${distrito}</h3><p>Cargando...</p>`;
@@ -105,7 +131,24 @@ async function loadMetas(distrito) {
   box.innerHTML = html;
 }
 
-// ===== LOGOUT =====
+
+// ============================
+//  MI DISTRITO & MIS METAS
+// ============================
+function showMyDistrict() {
+  if (!payload.distrito) return alert("No tienes distrito asignado");
+  loadMetas(payload.distrito);
+}
+
+function showMyMetas() {
+  if (!payload.distrito) return alert("No tienes distrito asignado");
+  loadMetas(payload.distrito);
+}
+
+
+// ============================
+//  CERRAR SESIÓN
+// ============================
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("token");
   window.location.href = "/";
