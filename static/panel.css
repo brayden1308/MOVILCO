@@ -108,3 +108,45 @@ th {
 td {
     padding: 6px;
 }
+.region-card {
+  background: #fff;
+  padding: 12px;
+  margin: 6px;
+  border-radius: 10px;
+  border: 1px solid #c5a3a3;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn-small {
+  background: var(--vinotinto);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  margin-top: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.btn-district {
+  display: block;
+  background: #a02a2a;
+  color: white;
+  padding: 10px;
+  margin: 6px auto;
+  width: 80%;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+}
