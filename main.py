@@ -1,158 +1,163 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from supabase import create_client, Client
 import bcrypt
 from jose import jwt, JWTError
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 import os
-
 
 # ===============================
 # CONFIGURACIÓN SUPABASE
 # ===============================
-
 SUPABASE_URL = "https://kjomvdghldqolamokekf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqb212ZGdobGRxb2xhbW9rZWtmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDgzODU2MiwiZXhwIjoyMDc2NDE0NTYyfQ.UF4FMUphQk4PEuzqAKVL6XjwezrcfG-I7kxgCd8gKFc"  
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtqb212ZGdobGRxb2xhbW9rZWtmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDgzODU2MiwiZXhwIjoyMDc2NDE0NTYyfQ.UF4FMUphQk4PEuzqAKVL6XjwezrcfG-I7kxgCd8gKFc"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ===============================
-# CONFIGURACIÓN JWT
+# JWT CONFIG
 # ===============================
-
-SECRET_KEY = "Emivargas1308" 
+SECRET_KEY = "Emivargas1308"
 ALGORITHM = "HS256"
 
 # ===============================
-# FASTAPI APP
+# FASTAPI INIT
 # ===============================
-
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://movilco.onrender.com"],
+    allow_origins=["https://movilco.onrender.com", "http://localhost:8000", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-#  Montar carpetas estáticas correctamente
+# STATIC
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/IMG", StaticFiles(directory="IMG"), name="IMG")
-app.mount("/static", StaticFiles(directory="."), name="static")
-from fastapi.middleware.cors import CORSMiddleware
+templates = Jinja2Templates(directory="templates")
 
-class UserRegister(BaseModel):
+@app.get("/", response_class=HTMLResponse)
+async def serve_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+# ============================
+# MODELOS
+# ============================
+class RegisterModel(BaseModel):
+    email: str
+    password: str
+    role: str = "misionera"
+    region: str | None = None
+    distrito: str | None = None
+
+class LoginModel(BaseModel):
     email: str
     password: str
 
-class UserLogin(BaseModel):
-    email: str
-    password: str
-
-# ===============================
-# RUTA: REGISTRO
-# ===============================
-
-@app.post("/register")
-async def register(user: UserRegister):
-    # Verificar si el usuario ya existe
-    existing_user = supabase.table("usuarios").select("*").eq("email", user.email).execute()
-    if existing_user.data:
-        raise HTTPException(status_code=400, detail="El usuario ya existe")
-
-    # Encriptar contraseña
-    hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-    # Insertar en Supabase
-    data = supabase.table("usuarios").insert({"email": user.email, "password": hashed}).execute()
-    print("Resultado Supabase INSERT:", data)
-    return {"message": "Usuario registrado correctamente", "db_response": data}
-
-
-# ===============================
-# RUTA: LOGIN
-# ===============================
-
-@app.post("/login")
-async def login(user: UserLogin):
-    response = supabase.table("usuarios").select("*").eq("email", user.email).execute()
-    if not response.data:
-        raise HTTPException(status_code=400, detail="Usuario no encontrado")
-
-    db_user = response.data[0]
-
-    # Verificar contraseña
-    if not bcrypt.checkpw(user.password.encode('utf-8'), db_user["password"].encode('utf-8')):
-        raise HTTPException(status_code=400, detail="Contraseña incorrecta")
-
-    # Generar token con email + id
-    token = jwt.encode({"email": db_user["email"], "id": db_user["id"]}, SECRET_KEY, algorithm=ALGORITHM)
-
-    return {"token": token}
-
-# ===============================
-# RUTA: ME (VER USUARIO ACTUAL)
-# ===============================
-
-@app.get("/me")
-async def get_me(Authorization: str = Header(None)):
-    if not Authorization:
-        raise HTTPException(status_code=401, detail="Token no proporcionado")
-
-    try:
-        token = Authorization.split(" ")[1]  # "Bearer token"
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return {"email": payload["email"], "id": payload["id"]}
-    except (JWTError, IndexError):
-        raise HTTPException(status_code=401, detail="Token inválido o expirado")
-@app.post("/logout")
-async def logout():
-    return {"message": "Logout exitoso. Elimina el token en el frontend."}
 class PasswordReset(BaseModel):
     email: str
     old_password: str
     new_password: str
 
+
+# ============================
+# AUTENTICACIÓN
+# ============================
+
+@app.post("/register")
+async def register(data: RegisterModel):
+    existing = supabase.table("usuarios").select("*").eq("email", data.email).execute()
+    if existing.data:
+        raise HTTPException(400, "Usuario ya existe")
+
+    hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
+    supabase.table("usuarios").insert({
+        "email": data.email,
+        "password": hashed,
+        "role": data.role,
+        "region": data.region,
+        "distrito": data.distrito
+    }).execute()
+
+    return {"message": "Usuario registrado correctamente"}
+
+@app.post("/login")
+async def login(data: LoginModel):
+    res = supabase.table("usuarios").select("*").eq("email", data.email).execute()
+    if not res.data:
+        raise HTTPException(400, "Usuario no encontrado")
+
+    user = res.data[0]
+
+    if not bcrypt.checkpw(data.password.encode(), user["password"].encode()):
+        raise HTTPException(400, "Contraseña incorrecta")
+
+    payload = {
+        "email": user["email"],
+        "id": user["id"],
+        "role": user.get("role"),
+        "region": user.get("region"),
+        "distrito": user.get("distrito")
+    }
+
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+    return {"token": token, "user": payload}
+
+@app.get("/me")
+async def me(Authorization: str = Header(None)):
+    if not Authorization:
+        raise HTTPException(401, "Sin token")
+
+    try:
+        token = Authorization.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except:
+        raise HTTPException(401, "Token inválido")
+
 @app.post("/reset-password")
-async def reset_password(data: PasswordReset):
-    # Buscar usuario
-    response = supabase.table("usuarios").select("*").eq("email", data.email).execute()
-    if not response.data:
-        raise HTTPException(status_code=400, detail="Usuario no encontrado")
+async def reset(data: PasswordReset):
+    res = supabase.table("usuarios").select("*").eq("email", data.email).execute()
+    if not res.data:
+        raise HTTPException(400, "Usuario no encontrado")
 
-    db_user = response.data[0]
+    user = res.data[0]
+    if not bcrypt.checkpw(data.old_password.encode(), user["password"].encode()):
+        raise HTTPException(400, "Contraseña incorrecta")
 
-    # Verificar contraseña actual
-    if not bcrypt.checkpw(data.old_password.encode('utf-8'), db_user["password"].encode('utf-8')):
-        raise HTTPException(status_code=400, detail="Contraseña actual incorrecta")
-
-    # Hash nueva contraseña
-    new_hashed = bcrypt.hashpw(data.new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-    # Actualizar en Supabase
+    new_hashed = bcrypt.hashpw(data.new_password.encode(), bcrypt.gensalt()).decode()
     supabase.table("usuarios").update({"password": new_hashed}).eq("email", data.email).execute()
 
-    return {"message": "Contraseña actualizada correctamente"}
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi import Request
+    return {"message": "Contraseña actualizada"}
 
 
-# Archivos estáticos
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/IMG", StaticFiles(directory="IMG"), name="IMG")
+# ============================
+# REGIONES / DISTRITOS / METAS
+# ============================
 
-# HTML
-templates = Jinja2Templates(directory="templates")
+@app.get("/regions")
+async def get_regions():
+    r = supabase.table("regiones").select("*").execute()
+    return r.data
 
-@app.get("/", response_class=HTMLResponse)
-async def get_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-@app.get("/", response_class=HTMLResponse)
-async def serve_index():
-    file_path = os.path.join(os.path.dirname(__file__), "templates/index.html")
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
+@app.get("/districts/{region_id}")
+async def get_districts(region_id: int):
+    r = supabase.table("distritos").select("*").eq("region_id", region_id).execute()
+    return r.data
+
+@app.get("/metas/{distrito}")
+async def get_metas(distrito: str, Authorization: str = Header(None)):
+    # validar district existente
+    r = supabase.table("distritos").select("*").eq("nombre", distrito).execute()
+    if not r.data:
+        raise HTTPException(404, "Distrito no encontrado")
+
+    distrito_id = r.data[0]["id"]
+    metas = supabase.table("metas").select("*").eq("distrito_id", distrito_id).execute()
+    return metas.data

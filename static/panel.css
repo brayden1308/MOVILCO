@@ -1,0 +1,13 @@
+/* panel.css - usa tu estilo existente y añade lo necesario */
+:root{--vinotinto:#800020}
+body{margin:0;font-family:Arial;background:#dcdcdc}
+.top-banner{background:var(--vinotinto);height:70px;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.logo{height:50px}
+.user-info{text-align:right}
+.main-container{display:flex;padding:20px}
+.menu{width:260px;display:flex;flex-direction:column;gap:10px}
+.menu-btn{background:white;border:2px solid #c4c4c4;padding:12px;border-radius:12px;cursor:pointer;text-align:left}
+.submenu{display:flex;flex-direction:column;margin-left:10px}
+.content-box{background:white;border-radius:12px;padding:20px;margin-left:30px;flex:1;min-height:450px}
+.region-item{padding:8px;border-radius:8px;border:1px solid #eee;background:#fff;cursor:pointer;margin-bottom:6px}
+.region-item:hover{background:#f6f6f6}

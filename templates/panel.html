@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Panel - MOVILCO</title>
+  <link rel="stylesheet" href="/static/css/panel.css">
+</head>
+<body>
+  <div class="top-banner">
+    <img src="/IMG/images-removebg-preview.png" class="logo" alt="logo">
+    <div class="user-info" id="userInfo"></div>
+  </div>
+
+  <div class="main-container">
+    <div class="menu">
+      <button class="menu-btn" onclick="toggleRegions()">Regiones</button>
+      <div id="regionsList" class="submenu"></div>
+
+      <div style="margin-top:20px">
+        <button class="menu-btn" onclick="loadContent('metas')">Metas del Distrito</button>
+      </div>
+
+      <button class="menu-btn" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <div class="content-box" id="contentBox">
+      <h2>Bienvenido</h2>
+      <div id="mainArea">Selecciona una región para continuar</div>
+    </div>
+  </div>
+
+  <script src="/static/js/panel.js"></script>
+</body>
+</html>
