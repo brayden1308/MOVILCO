@@ -1,134 +1,138 @@
+/* 🎨 Paleta corporativa */
 :root {
-    --vinotinto: #A3001B;
-    --vinotinto-dark: #6A0012;
-    --dorado: #D4AF37;
-    --dorado-dark: #B9921F;
-    --gris: #EDEDED;
-    --negro: #1A1A1A;
+  --vinotinto: #6b0f1a;
+  --vinotinto-dark: #480a12;
+  --gold: #cba054;
+  --light-bg: #f4f4f4;
+  --white: #ffffff;
 }
 
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-}
-
+/* === LAYOUT GENERAL === */
 body {
-    background: #D7E3F1; /* igual al fondo azul claro de tu ejemplo */
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--light-bg);
+  height: 100vh;
+  display: flex;
 }
 
-/* ================= HEADER SUPERIOR ================= */
-.header {
-    background: var(--vinotinto);
-    height: 110px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 25px;
-    color: white;
+#sidebar {
+  width: 260px;
+  background-color: var(--vinotinto);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 15px;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
 }
 
-.header img {
-    height: 95px;
+#main-content {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
 }
 
-.header .user-info {
-    text-align: right;
-    font-size: 18px;
-    color: #FFD1D1;
+/* === LOGO === */
+#sidebar img {
+  width: 150px;
+  margin-bottom: 20px;
+  filter: drop-shadow(2px 2px 3px black);
 }
 
-.header .user-avatar {
-    width: 70px;
-    height: 70px;
-    background: black;
-    border-radius: 50%;
-    margin-left: 10px;
+/* === USUARIO === */
+#userInfo {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: var(--vinotinto-dark);
+  border-radius: 8px;
+  width: 90%;
 }
 
-/* =============== LAYOUT =============== */
-.container {
-    display: flex;
-    padding: 20px;
-    gap: 25px;
+/* === BOTONES DEL SIDEBAR === */
+.side-btn {
+  width: 90%;
+  background-color: var(--white);
+  border: 0;
+  color: var(--vinotinto-dark);
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-/* =============== MENÚ LATERAL =============== */
-.sidebar {
-    width: 230px;
-    background: var(--gris);
-    padding: 20px;
-    border-radius: 10px;
-    border: 3px solid var(--vinotinto);
+.side-btn:hover {
+  background-color: var(--gold);
+  color: var(--vinotinto-dark);
+  transform: translateX(5px);
 }
 
-.sidebar button {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    border: 2px solid var(--vinotinto);
-    background: white;
-    color: var(--vinotinto);
-    border-radius: 10px;
-    font-size: 17px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.sidebar button:hover {
-    background: var(--vinotinto);
-    color: white;
-}
-
-/* BOTÓN DE RETROALIMENTACIÓN */
+/* === RETROALIMENTACIÓN === */
 .feedback-btn {
-    margin-top: 30px;
-    width: 100%;
-    padding: 15px;
-    background: var(--vinotinto);
-    color: white;
-    font-size: 18px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
+  margin-top: auto;
+  width: 90%;
+  background-color: var(--gold);
+  border: none;
+  color: var(--vinotinto-dark);
+  font-size: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.3s;
 }
 
 .feedback-btn:hover {
-    background: var(--vinotinto-dark);
+  background-color: var(--vinotinto-dark);
+  color: var(--white);
 }
 
-/* =============== CONTENIDO PRINCIPAL =============== */
-.main-content {
-    flex: 1;
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    border: 3px solid var(--vinotinto);
+/* === TABLAS DE METAS === */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 15px;
 }
 
-/* =============== BOTONES DORADOS (internos) =============== */
+.table th {
+  background-color: var(--vinotinto);
+  color: var(--white);
+  padding: 10px;
+}
+
+.table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.tr:hover {
+  background-color: #eee;
+}
+
+/* === FORMULARIOS === */
+.form-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+}
+
 .btn-gold {
-    background: var(--dorado);
-    border: 2px solid var(--dorado-dark);
-    padding: 10px 18px;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--negro);
-    border-radius: 10px;
-    cursor: pointer;
+  background-color: var(--gold);
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .btn-gold:hover {
-    background: var(--dorado-dark);
-    color: white;
+  background-color: var(--vinotinto);
+  color: var(--white);
 }
-
-/* =============== IMAGEN CENTRAL =============== */
-.main-image {
-    width: 100%;
-    border-radius: 15px;
-    margin-top: 15px;
-}
-
