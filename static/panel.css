@@ -1,152 +1,134 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f7f4ef;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    color: #4a2c2a;
+:root {
+    --vinotinto: #A3001B;
+    --vinotinto-dark: #6A0012;
+    --dorado: #D4AF37;
+    --dorado-dark: #B9921F;
+    --gris: #EDEDED;
+    --negro: #1A1A1A;
 }
 
-/* HEADER */
-header {
-    background: #4a2c2a;
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #D7E3F1; /* igual al fondo azul claro de tu ejemplo */
+}
+
+/* ================= HEADER SUPERIOR ================= */
+.header {
+    background: var(--vinotinto);
+    height: 110px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 30px;
-}
-
-.logo {
-    height: 60px;
-}
-
-.logout-btn {
-    background: #c2352f;
-    border: none;
-    padding: 10px 15px;
+    padding: 0 25px;
     color: white;
-    cursor: pointer;
-    border-radius: 8px;
 }
 
-/* USER INFO */
-.user-info {
-    margin-top: 20px;
+.header img {
+    height: 95px;
+}
+
+.header .user-info {
+    text-align: right;
     font-size: 18px;
+    color: #FFD1D1;
 }
 
-/* CARD */
-.card {
-    width: 90%;
-    max-width: 700px;
+.header .user-avatar {
+    width: 70px;
+    height: 70px;
+    background: black;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+/* =============== LAYOUT =============== */
+.container {
+    display: flex;
+    padding: 20px;
+    gap: 25px;
+}
+
+/* =============== MENÚ LATERAL =============== */
+.sidebar {
+    width: 230px;
+    background: var(--gris);
+    padding: 20px;
+    border-radius: 10px;
+    border: 3px solid var(--vinotinto);
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 2px solid var(--vinotinto);
     background: white;
-    margin: auto;
+    color: var(--vinotinto);
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sidebar button:hover {
+    background: var(--vinotinto);
+    color: white;
+}
+
+/* BOTÓN DE RETROALIMENTACIÓN */
+.feedback-btn {
     margin-top: 30px;
+    width: 100%;
+    padding: 15px;
+    background: var(--vinotinto);
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.feedback-btn:hover {
+    background: var(--vinotinto-dark);
+}
+
+/* =============== CONTENIDO PRINCIPAL =============== */
+.main-content {
+    flex: 1;
+    background: white;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    border: 3px solid var(--vinotinto);
 }
 
-.banner {
+/* =============== BOTONES DORADOS (internos) =============== */
+.btn-gold {
+    background: var(--dorado);
+    border: 2px solid var(--dorado-dark);
+    padding: 10px 18px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--negro);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-gold:hover {
+    background: var(--dorado-dark);
+    color: white;
+}
+
+/* =============== IMAGEN CENTRAL =============== */
+.main-image {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 15px;
+    margin-top: 15px;
 }
 
-.btn {
-    margin: 15px 10px;
-    padding: 12px 20px;
-    font-size: 16px;
-    color: white;
-    background: #4a2c2a;
-    border: none;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: 0.2s;
-}
-
-.btn:hover {
-    background: #7a4d49;
-}
-
-.select-text {
-    font-size: 18px;
-    margin: 15px 0;
-}
-.list-container {
-    width: 90%;
-    max-width: 700px;
-    margin: 15px auto;
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,.1);
-}
-
-.region-item {
-    background: #d9c085;
-    margin: 8px 0;
-    padding: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.region-item:hover {
-    background: #c8ae6f;
-}
-
-table {
-    text-align: center;
-    font-size: 16px;
-}
-
-th {
-    background: #4a2c2a;
-    color: white;
-    padding: 8px;
-}
-td {
-    padding: 6px;
-}
-.region-card {
-  background: #fff;
-  padding: 12px;
-  margin: 6px;
-  border-radius: 10px;
-  border: 1px solid #c5a3a3;
-  cursor: pointer;
-  text-align: center;
-}
-
-.btn-small {
-  background: var(--vinotinto);
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  margin-top: 8px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.btn-district {
-  display: block;
-  background: #a02a2a;
-  color: white;
-  padding: 10px;
-  margin: 6px auto;
-  width: 80%;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.table {
-  width: 100%;
-  text-align: center;
-  border-collapse: collapse;
-}
-
-.table th, .table td {
-  border: 1px solid #ddd;
-  padding: 6px;
-}

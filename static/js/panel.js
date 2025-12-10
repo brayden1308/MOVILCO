@@ -1,120 +1,144 @@
-// ============================
-//  CONFIGURACIÓN BASE
-// ============================
+// 🌐 API Base
 const API = "https://movilco.onrender.com";
-const token = localStorage.getItem("token");
 
-// Si no hay token: vuelve al login
+// 🔐 Token de sesión
+const token = localStorage.getItem("token");
 if (!token) window.location.href = "/";
 
-// Decodificar token
-const payload = JSON.parse(atob(token.split(".")[1]));
+// 🔎 Información del usuario
+const user = JSON.parse(atob(token.split(".")[1]));
 
-// Mostrar info del usuario
+// Mostrar usuario
 document.getElementById("userInfo").innerHTML = `
-  <strong>${payload.email}</strong><br>
-  ${payload.role} - ${payload.distrito || "Nacional"}
+  <strong>${user.email}</strong><br>
+  ${user.role} - ${user.distrito || 'Nacional'}
 `;
 
-// ============================
-//  CONTROL POR ROLES
-// ============================
-if (payload.role === "misionera") {
-  document.getElementById("btnRegiones").style.display = "none";
-}
+/* ==================================================
+   PANEL ACTIONS (BOTONES)
+================================================== */
 
-if (payload.role === "distrito") {
-  document.getElementById("btnRegiones").style.display = "none";
-}
+// Cargar metas del usuario según su distrito o rol
+async function showMetas() {
+  const main = document.getElementById("main-content");
+  main.innerHTML = `<h2>Metas</h2><p>Cargando...</p>`;
 
-// Nacional = todo habilitado (no tocamos nada)
-
-
-// ============================
-//  REGIONES
-// ============================
-async function toggleRegions() {
-  const cont = document.getElementById("regionsList");
-
-  if (cont.innerHTML.trim() !== "") {
-    cont.innerHTML = "";
-    document.getElementById("mainArea").innerHTML = "<p>Selecciona una región</p>";
+  let url = "";
+  if (user.role === "Misionera") {
+    url = `${API}/metas/${encodeURIComponent(user.distrito)}`;
+  } else {
+    main.innerHTML = `<p>Selecciona una región para continuar</p>`;
     return;
   }
 
-  cont.innerHTML = "<p>Cargando regiones...</p>";
-
-  const res = await fetch(`${API}/regions`);
-  const regions = await res.json();
-
-  cont.innerHTML = "";
-  regions.forEach(r => {
-    const div = document.createElement("div");
-    div.className = "region-card";
-    div.innerHTML = `
-      <p>${r.nombre}</p>
-      <button class="btn-small" onclick="loadDistricts(${r.id}, '${r.nombre}')">Ver Distritos</button>
-    `;
-    cont.appendChild(div);
-  });
-}
-
-
-// ============================
-//  DISTRITOS
-// ============================
-async function loadDistricts(region_id, region_name) {
-  const box = document.getElementById("mainArea");
-  box.innerHTML = `<h3>${region_name}</h3><p>Cargando distritos...</p>`;
-
-  const res = await fetch(`${API}/districts/${region_id}`);
-  const districts = await res.json();
-
-  box.innerHTML = `<h3>${region_name}</h3>`;
-
-  if (!districts.length) {
-    box.innerHTML += "<p>No hay distritos registrados</p>";
-    return;
-  }
-
-  districts.forEach(d => {
-    const btn = document.createElement("button");
-    btn.className = "btn-district";
-    btn.textContent = d.nombre;
-    btn.onclick = () => loadMetas(d.nombre);
-    box.appendChild(btn);
-  });
-}
-
-
-// ============================
-//  METAS POR DISTRITO
-// ============================
-async function loadMetas(distrito) {
-  const box = document.getElementById("mainArea");
-  box.innerHTML = `<h3>Metas - ${distrito}</h3><p>Cargando...</p>`;
-
-  const res = await fetch(`${API}/metas/${encodeURIComponent(distrito)}`, {
+  const res = await fetch(url, {
     headers: { "Authorization": `Bearer ${token}` }
   });
 
   if (!res.ok) {
-    box.innerHTML = `<p>Error cargando metas 🚫</p>`;
+    main.innerHTML = `<p>🚫 No se pudieron cargar metas</p>`;
     return;
   }
 
   const metas = await res.json();
+  renderMetas(main, metas, user.distrito);
+}
 
-  if (!metas.length) {
-    box.innerHTML = `<h3>Metas - ${distrito}</h3><p>No hay metas registradas 📉</p>`;
+
+// Mostrar form si rol es Admin o Nacional
+function showAdd() {
+  const main = document.getElementById("main-content");
+
+  if (user.role !== "Admin" && user.role !== "Nacional") {
+    main.innerHTML = `<p>❌ No tienes permisos para añadir metas</p>`;
     return;
   }
 
-  let html = `
-    <h3>Metas - ${distrito}</h3>
-    <table class="table">
-      <tr><th>Año</th><th>Mes</th><th>Objetivo</th><th>Alcanzado</th></tr>
+  main.innerHTML = `
+    <h2>➕ Añadir Meta</h2>
+    <form id="addForm" class="form-box">
+      <input type="text" id="distrito" placeholder="Distrito" required />
+      <input type="number" id="anio" placeholder="Año" required />
+      <input type="text" id="mes" placeholder="Mes" required />
+      <input type="number" id="objetivo" placeholder="Objetivo" required />
+      <button class="btn-gold" type="submit">Guardar Meta</button>
+    </form>
+    <div id="msg"></div>
   `;
+
+  document.getElementById("addForm").onsubmit = saveMeta;
+}
+
+
+// Mostrar progreso simple por ahora
+async function showProgress() {
+  const main = document.getElementById("main-content");
+  main.innerHTML = `<h2>📊 Progreso del Distrito</h2><p>Cargando...</p>`;
+
+  const res = await fetch(`${API}/metas/${encodeURIComponent(user.distrito)}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+
+  const metas = await res.json();
+  let done = metas.filter(m => m.alcanzado >= m.objetivo).length;
+
+  main.innerHTML = `
+    <p>Metas completadas: ${done} / ${metas.length}</p>
+    <progress max="${metas.length}" value="${done}"></progress>
+  `;
+}
+
+
+// Mostrar info de usuario
+function showPersonal() {
+  const main = document.getElementById("main-content");
+
+  main.innerHTML = `
+    <h2>👤 Perfil</h2>
+    <p>Email: ${user.email}</p>
+    <p>Rol: ${user.role}</p>
+    <p>Distrito: ${user.distrito || "Nacional"}</p>
+    <button class="feedback-btn" onclick="logout()">Cerrar Sesión</button>
+  `;
+}
+
+
+// Guardar meta (Admin solo)
+async function saveMeta(e) {
+  e.preventDefault();
+  const msg = document.getElementById("msg");
+
+  const data = {
+    distrito: document.getElementById("distrito").value,
+    anio: parseInt(document.getElementById("anio").value),
+    mes: document.getElementById("mes").value,
+    objetivo: parseInt(document.getElementById("objetivo").value)
+  };
+
+  const res = await fetch(`${API}/metas`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  msg.innerHTML = res.ok
+    ? "<p style='color:green'>✔ Meta guardada</p>"
+    : "<p style='color:red'>❌ No se pudo guardar</p>";
+}
+
+
+// Dibujar metas
+function renderMetas(main, metas, distrito) {
+  if (!metas.length) {
+    main.innerHTML = `<h2>No hay metas en ${distrito}</h2>`;
+    return;
+  }
+
+  let html = `<h2>Metas - ${distrito}</h2><table class="table">`;
+  html += `<tr><th>Año</th><th>Mes</th><th>Objetivo</th><th>Alcanzado</th></tr>`;
 
   metas.forEach(m => {
     html += `
@@ -123,30 +147,20 @@ async function loadMetas(distrito) {
         <td>${m.mes}</td>
         <td>${m.objetivo}</td>
         <td>${m.alcanzado}</td>
-      </tr>
-    `;
+      </tr>`;
   });
 
-  html += "</table>";
-  box.innerHTML = html;
+  html += `</table>`;
+  main.innerHTML = html;
 }
 
 
-// ============================
-//  MI DISTRITO & MIS METAS
-// ============================
-function showMyDistrict() {
-  if (!payload.distrito) return alert("No tienes distrito asignado");
-  loadMetas(payload.distrito);
+// Logout
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
 }
-
-function showMyMetas() {
-  if (!payload.distrito) return alert("No tienes distrito asignado");
-  loadMetas(payload.distrito);
-}
-
-
-// ============================
+//===========================
 //  CERRAR SESIÓN
 // ============================
 document.getElementById("logoutBtn").addEventListener("click", () => {
