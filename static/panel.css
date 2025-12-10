@@ -1,138 +1,120 @@
-/* 🎨 Paleta corporativa */
 :root {
-  --vinotinto: #6b0f1a;
-  --vinotinto-dark: #480a12;
-  --gold: #cba054;
-  --light-bg: #f4f4f4;
-  --white: #ffffff;
+  --vinotinto: #5E0B15;
+  --dorado: #c9a227;
+  --gris-fondo: #f4f4f4;
+  --gris-claro: #e6e6e6;
+  --texto: #333;
+  --radius: 14px;
 }
 
-/* === LAYOUT GENERAL === */
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: var(--light-bg);
-  height: 100vh;
-  display: flex;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-#sidebar {
-  width: 260px;
-  background-color: var(--vinotinto);
-  color: var(--white);
+body {
+  background: var(--gris-fondo);
+}
+
+/* HEADER */
+header {
+  background: var(--vinotinto);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 30px;
+}
+
+.logo {
+  height: 60px;
+}
+
+.logout-btn {
+  background: var(--dorado);
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: bold;
+  cursor: pointer;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #b8961f;
+}
+
+/* USER INFO */
+.user-info {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+/* MAIN PANEL */
+.main-content {
+  width: 90%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.main-content h1 {
+  color: var(--vinotinto);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* CARD */
+.container-panel {
+  background: white;
+  width: 85%;
+  margin: auto;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.12);
+}
+
+.banner {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* BOTONES */
+.buttons-section {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 15px;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+  gap: 12px;
 }
 
-#main-content {
-  flex: 1;
-  padding: 25px;
-  overflow-y: auto;
-}
-
-/* === LOGO === */
-#sidebar img {
-  width: 150px;
-  margin-bottom: 20px;
-  filter: drop-shadow(2px 2px 3px black);
-}
-
-/* === USUARIO === */
-#userInfo {
-  text-align: center;
-  font-size: 14px;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: var(--vinotinto-dark);
-  border-radius: 8px;
-  width: 90%;
-}
-
-/* === BOTONES DEL SIDEBAR === */
-.side-btn {
-  width: 90%;
-  background-color: var(--white);
-  border: 0;
-  color: var(--vinotinto-dark);
+.btn {
+  width: 70%;
+  max-width: 320px;
+  background: var(--vinotinto);
+  color: #fff;
   padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
-  font-weight: bold;
+  font-size: 18px;
+  border: none;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: 0.3s;
 }
 
-.side-btn:hover {
-  background-color: var(--gold);
-  color: var(--vinotinto-dark);
-  transform: translateX(5px);
+.btn:hover {
+  background: #460811;
 }
 
-/* === RETROALIMENTACIÓN === */
-.feedback-btn {
-  margin-top: auto;
-  width: 90%;
-  background-color: var(--gold);
-  border: none;
-  color: var(--vinotinto-dark);
-  font-size: 16px;
-  padding: 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  transition: 0.3s;
-}
-
-.feedback-btn:hover {
-  background-color: var(--vinotinto-dark);
-  color: var(--white);
-}
-
-/* === TABLAS DE METAS === */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-  font-size: 15px;
-}
-
-.table th {
-  background-color: var(--vinotinto);
-  color: var(--white);
-  padding: 10px;
-}
-
-.table td {
-  padding: 8px;
-  border: 1px solid #ddd;
-}
-
-.tr:hover {
-  background-color: #eee;
-}
-
-/* === FORMULARIOS === */
-.form-box input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border: 2px solid var(--gold);
-  border-radius: 8px;
-}
-
-.btn-gold {
-  background-color: var(--gold);
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-gold:hover {
-  background-color: var(--vinotinto);
-  color: var(--white);
+/* TEXTO */
+.select-text {
+  font-size: 17px;
+  margin: 15px 0;
+  color: var(--texto);
 }

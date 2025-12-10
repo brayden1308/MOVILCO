@@ -4,36 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel - Movilco</title>
+
   <link rel="stylesheet" href="/static/panel.css">
 </head>
 
 <body>
+
+  <!-- HEADER -->
   <header>
     <img src="/IMG/logo.png" class="logo" alt="Movilco">
     <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
   </header>
 
+  <!-- USER INFO -->
   <section class="user-info">
-    <h2 id="userEmail"></h2>
+    <h2 id="userEmail">Cargando usuario...</h2>
     <p id="userDetails"></p>
   </section>
 
+  <!-- MAIN CONTENT -->
   <section class="main-content">
     <h1>Seguimiento de ventas Líderes</h1>
-    
-    <div class="card">
-      <img src="/IMG/nacional.png" class="banner">
+
+    <div class="container-panel">
+
+      <!-- IMAGEN PRINCIPAL -->
+      <img src="/IMG/nacional.png" class="banner" alt="Banner Nacional">
+
       <p class="select-text">Selecciona una región para continuar</p>
-      <button class="btn" id="btnRegiones">Regiones</button>
-      <button class="btn" id="btnMetas">Metas del Distrito</button>
-      <button id="btnRegiones" onclick="toggleRegions()">📍 Regiones</button>
-      <button id="btnDistritos" onclick="showMyDistrict()">🏙️ Mi Distrito</button>
-      <button id="btnMetas" onclick="showMyMetas()">📊 Mis Metas</button>
-      <button id="logoutBtn" onclick="logout()">🚪 Salir</button>
+
+      <!-- BOTONES -->
+      <div class="buttons-section">
+        <button class="btn" onclick="toggleRegions()">📍 Regiones</button>
+        <button class="btn" onclick="showMyDistrict()">🏙️ Mi Distrito</button>
+        <button class="btn" onclick="showMyMetas()">📊 Mis Metas</button>
+        <button class="btn" onclick="logout()">🚪 Cerrar sesión</button>
+      </div>
+
+      <!-- ÁREA DONDE SE MOSTRARÁ TODO DINÁMICO -->
+      <div id="dynamicArea" class="dynamic-area"></div>
 
     </div>
   </section>
 
   <script src="/static/js/panel.js"></script>
+
 </body>
 </html>
